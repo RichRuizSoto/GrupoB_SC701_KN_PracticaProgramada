@@ -96,10 +96,7 @@ namespace API.Controllers
             existingCliente.Direccion = cliente.Direccion;
 
 
-            if (cliente.Telefonos != null && cliente.Telefonos.Any())
-            {
-                existingCliente.Telefonos = cliente.Telefonos;
-            }
+            existingCliente.Telefonos = cliente.Telefonos ?? new List<Telefono>();
 
 
             return Ok(existingCliente);
