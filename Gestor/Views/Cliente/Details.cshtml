@@ -45,12 +45,31 @@
             @Html.DisplayFor(model => model.Direccion)
         </dd>
     </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Telefonos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Telefonos)
-        </dd>
+    <dt class="col-sm-2">
+        Teléfonos
+    </dt>
+
+    <dd class="col-sm-10">
+
+        @if (Model.Telefonos != null && Model.Telefonos.Any())
+        {
+            <ul>
+
+                @foreach (var telefono in Model.Telefonos)
+                {
+                    <li>
+                        @telefono.Numero - @telefono.Tipo
+                    </li>
+                }
+
+            </ul>
+        }
+        else
+        {
+            <span>Sin teléfonos registrados</span>
+        }
+
+    </dd>
     </dl>
 </div>
 <div>
