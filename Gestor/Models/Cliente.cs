@@ -9,8 +9,8 @@
         public string Correo { get; set; } = string.Empty;
         public string Direccion { get; set; } = string.Empty;
 
-        public ICollection<Telefono> Telefonos { get; set; } = new List<Telefono>();
-    
+        public List<Telefono> Telefonos { get; set; } = new List<Telefono>();
+
     }
 }
 

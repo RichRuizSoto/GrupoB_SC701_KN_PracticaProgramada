@@ -83,18 +83,26 @@ namespace API.Controllers
         public IActionResult UpdateCliente(int id, Cliente cliente)
         {
             var existingCliente = clientes.FirstOrDefault(c => c.Id == id);
+
             if (existingCliente == null)
             {
                 return NotFound();
             }
+
             existingCliente.Nombre = cliente.Nombre;
             existingCliente.Apellido = cliente.Apellido;
             existingCliente.Identificacion = cliente.Identificacion;
             existingCliente.Correo = cliente.Correo;
             existingCliente.Direccion = cliente.Direccion;
-            existingCliente.Telefonos = cliente.Telefonos;
 
-            return Ok(cliente);
+
+            if (cliente.Telefonos != null && cliente.Telefonos.Any())
+            {
+                existingCliente.Telefonos = cliente.Telefonos;
+            }
+
+
+            return Ok(existingCliente);
         }
 
         [HttpDelete("{id}")]

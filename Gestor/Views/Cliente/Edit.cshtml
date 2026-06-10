@@ -38,11 +38,54 @@
                 <input asp-for="Direccion" class="form-control" />
                 <span asp-validation-for="Direccion" class="text-danger"></span>
             </div>
+            
             <div class="form-group">
-                <label asp-for="Telefonos" class="control-label"></label>
-                <input asp-for="Telefonos" class="form-control" />
-                <span asp-validation-for="Telefonos" class="text-danger"></span>
+
+                <label class="control-label">Teléfonos</label>
+
+
+                @if (Model.Telefonos != null && Model.Telefonos.Any())
+                {
+
+                    @for (int i = 0; i < Model.Telefonos.Count; i++)
+                    {
+
+                        <div class="mb-3">
+
+                            <input asp-for="Telefonos[i].Id"
+                                   type="hidden" />
+
+                            <input asp-for="Telefonos[i].ClienteId"
+                                   type="hidden" />
+
+
+                            <label>Número</label>
+
+                            <input asp-for="Telefonos[i].Numero"
+                                   class="form-control" />
+
+
+                            <label>Tipo</label>
+
+                            <input asp-for="Telefonos[i].Tipo"
+                                   class="form-control" />
+
+                        </div>
+
+                    }
+
+                }
+                else
+                {
+                    <p>Sin teléfonos registrados</p>
+                }
+
             </div>
+
+
+
+
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
