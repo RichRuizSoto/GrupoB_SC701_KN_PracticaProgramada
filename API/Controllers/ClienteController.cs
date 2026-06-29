@@ -153,6 +153,15 @@ namespace API.Controllers
             return edad >= 18;
         }
 
+        public static bool clienteExiste(int id)
+        {
+            if (clientes.FirstOrDefault(c => c.Id == id) == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
     }
 
 }
