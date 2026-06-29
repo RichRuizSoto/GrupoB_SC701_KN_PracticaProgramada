@@ -18,6 +18,7 @@ namespace API.Controllers
                 Identificacion = "1234567890",
                 Correo = "rruiz@gmail.com",
                 Direccion = "Heredia",
+                fechaNacimiento = new DateOnly(2002, 5, 15),
                 Telefonos = new List<Telefono>
                 {
                     new Telefono
@@ -42,6 +43,7 @@ namespace API.Controllers
                 Identificacion = "0987654321",
                 Correo = "mgomez@gmail.com",
                 Direccion = "Alajuela",
+                fechaNacimiento= new DateOnly(1985, 10, 20),
                 Telefonos = new List<Telefono>
                 {
                     new Telefono
@@ -74,6 +76,17 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult CreateCliente(Cliente cliente)
         {
+
+            if(EsMayorDeEdad(cliente.fechaNacimiento) == false)
+            {
+                return BadRequest("El cliente debe ser mayor de edad.");
+            }
+
+            if (identficacionRepetida(cliente.Identificacion))
+            {
+                return BadRequest("La identificación ya está en uso por otro cliente.");
+            }
+
             cliente.Id = clientes.Max(c => c.Id) + 1;
             clientes.Add(cliente);
             return CreatedAtAction("" , cliente);
@@ -89,12 +102,22 @@ namespace API.Controllers
                 return NotFound();
             }
 
+            if(identficacionRepetida(cliente.Identificacion) && existingCliente.Identificacion != cliente.Identificacion)
+            {
+                return BadRequest("La identificación ya está en uso por otro cliente.");
+            }
+
+            if (EsMayorDeEdad(cliente.fechaNacimiento) == false)
+            {
+                return BadRequest("El cliente debe ser mayor de edad.");
+            }
+
             existingCliente.Nombre = cliente.Nombre;
             existingCliente.Apellido = cliente.Apellido;
             existingCliente.Identificacion = cliente.Identificacion;
             existingCliente.Correo = cliente.Correo;
             existingCliente.Direccion = cliente.Direccion;
-
+            existingCliente.fechaNacimiento = cliente.fechaNacimiento;
 
             existingCliente.Telefonos = cliente.Telefonos ?? new List<Telefono>();
 
@@ -114,7 +137,31 @@ namespace API.Controllers
             return Ok();
         }
 
+        public static bool identficacionRepetida(string identificacion)
+        {
+            return clientes.Any(c => c.Identificacion == identificacion);
+        }
 
+        public static bool EsMayorDeEdad(DateOnly fechaNacimiento)
+        {
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
+            var edad = hoy.Year - fechaNacimiento.Year;
+
+            if (fechaNacimiento > hoy.AddYears(-edad))
+                edad--;
+
+            return edad >= 18;
+        }
+
+        public static bool clienteExiste(int id)
+        {
+            if (clientes.FirstOrDefault(c => c.Id == id) == null)
+            {
+                return false;
+            }
+            return true;
+        }
 
     }
+
 }
