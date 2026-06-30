@@ -17,134 +17,95 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-
     <div>
-
-        <h2>
-            Directorio Telefónico
-        </h2>
-
-        <p class="text-muted">
-            Lista de clientes registrados
-        </p>
-
+        <h2>Directorio Telefónico</h2>
+        <p class="text-muted mb-0">Lista de clientes registrados</p>
     </div>
 
-    <a asp-action="Create"
-       class="btn btn-primary">
-
+    <a asp-action="Create" class="btn btn-primary">
         Nuevo Cliente
-
     </a>
-
 </div>
 
-<div class="row">
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        No hay clientes registrados.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            var color = colores[colorIndex % colores.Length];
+            colorIndex++;
 
-    @foreach (var item in Model)
-    {
-        var color = colores[colorIndex % colores.Length];
-        colorIndex++;
+            <div class="col-12 mb-4">
+                <div class="cliente-card p-4 rounded shadow-sm" style="background-color:@color;">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <div class="cliente-nombre fw-bold fs-4">
+                                @item.Nombre @item.Apellido
+                            </div>
 
-        <div class="col-12 mb-4">
+                            <div class="cliente-info mt-3">
+                                <strong>Identificación:</strong> @item.Identificacion
+                            </div>
 
-            <div class="cliente-card"
-                 style="background-color:@color;">
+                            <div class="cliente-info">
+                                <strong>Correo:</strong> @item.Correo
+                            </div>
 
-                <div class="d-flex justify-content-between align-items-start">
+                            <div class="cliente-info">
+                                <strong>Dirección:</strong> @item.Direccion
+                            </div>
 
-                    <div>
-
-                        <div class="cliente-nombre">
-
-                            @item.Nombre @item.Apellido
-
+                            <div class="cliente-info">
+                                <strong>Fecha de nacimiento:</strong> @item.fechaNacimiento.ToString("dd/MM/yyyy")
+                            </div>
                         </div>
-
-                        <div class="cliente-info mt-3">
-
-                            <strong>Identificación:</strong>
-                            @item.Identificacion
-
-                        </div>
-
-                        <div class="cliente-info">
-
-                            <strong>Correo:</strong>
-                            @item.Correo
-
-                        </div>
-
-                        <div class="cliente-info">
-
-                            <strong>Dirección:</strong>
-                            @item.Direccion
-
-                        </div>
-
                     </div>
 
-                </div>
+                    <hr />
 
-                <hr />
+                    <h6>Teléfonos</h6>
 
-                <h6>
-                    Teléfonos
-                </h6>
-
-                @if (item.Telefonos.Any())
-                {
-                    @foreach (var telefono in item.Telefonos)
+                    @if (item.Telefonos != null && item.Telefonos.Any())
                     {
-                        <div class="telefono-item">
-
-                            <strong>
-                                @telefono.Tipo:
-                            </strong>
-
-                            @telefono.Numero
-
-                        </div>
+                        foreach (var telefono in item.Telefonos)
+                        {
+                            <div class="telefono-item">
+                                <strong>@telefono.Tipo:</strong> @telefono.Numero
+                            </div>
+                        }
                     }
-                }
-                else
-                {
-                    <p class="text-muted">
-                        Sin teléfonos registrados
-                    </p>
-                }
+                    else
+                    {
+                        <p class="text-muted mb-0">Sin teléfonos registrados</p>
+                    }
 
-                <div class="mt-4 d-flex gap-2">
+                    <div class="mt-4 d-flex gap-2 flex-wrap">
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-info text-white">
+                            Details
+                        </a>
 
-                    <a asp-action="Details"
-                       asp-route-id="@item.Id"
-                       class="btn btn-info text-white">
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-warning text-white">
+                            Edit
+                        </a>
 
-                        Details
-
-                    </a>
-
-                    <a asp-action="Edit"
-                       asp-route-id="@item.Id"
-                       class="btn btn-warning text-white">
-
-                        Edit
-
-                    </a>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@item.Id"
-                       class="btn btn-danger">
-
-                        Delete
-
-                    </a>
-
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-danger">
+                            Delete
+                        </a>
+                    </div>
                 </div>
-
             </div>
-
-        </div>
-    }
-
-</div>
+        }
+    </div>
+}

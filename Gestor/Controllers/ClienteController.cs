@@ -33,12 +33,24 @@ namespace Gestor.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Cliente cleinte)
+        public async Task<IActionResult> Create(Cliente cliente)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            await httpClient.PostAsJsonAsync("https://localhost:7217/api/cliente", cleinte);
+            if (!ModelState.IsValid)
+            {
+                return View(cliente);
+            }
 
-            return RedirectToAction("Index");
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.PostAsJsonAsync("https://localhost:7217/api/cliente", cliente);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError(string.Empty, error);
+                return View(cliente);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
@@ -57,11 +69,24 @@ namespace Gestor.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Cliente cliente)
+        public async Task<IActionResult> Edit(Cliente cliente)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(cliente);
+            }
+
             var httpClient = _httpClientFactory.CreateClient();
-            await httpClient.PutAsJsonAsync($"https://localhost:7217/api/cliente/{id}", cliente);
-            return RedirectToAction("Index");
+            var response = await httpClient.PutAsJsonAsync($"https://localhost:7217/api/cliente/{cliente.Id}", cliente);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError(string.Empty, error);
+                return View(cliente);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(int id)
