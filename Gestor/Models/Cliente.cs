@@ -8,7 +8,7 @@
         public string Identificacion { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
         public string Direccion { get; set; } = string.Empty;
-
+        public DateOnly fechaNacimiento { get; set; }
         public List<Telefono> Telefonos { get; set; } = new List<Telefono>();
 
     }
