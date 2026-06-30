@@ -1,0 +1,98 @@
+﻿@model IEnumerable<API.Models.Vehiculo>
+
+@{
+    ViewData["Title"] = "Vehículos";
+
+    string[] colores =
+    {
+        "#dbeafe",
+        "#dcfce7",
+        "#fef3c7",
+        "#fae8ff",
+        "#fee2e2",
+        "#e0f2fe"
+    };
+
+    int colorIndex = 0;
+    var clientesPorId = ViewBag.ClientesPorId as Dictionary<int, string>;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Vehículos</h2>
+        <p class="text-muted mb-0">Lista de vehículos registrados</p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        Nuevo Vehículo
+    </a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        No hay vehículos registrados.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            var color = colores[colorIndex % colores.Length];
+            colorIndex++;
+
+            var nombreCliente = clientesPorId != null && clientesPorId.ContainsKey(item.ClienteId)
+                ? clientesPorId[item.ClienteId]
+                : "Cliente no encontrado";
+
+            <div class="col-12 mb-4">
+                <div class="vehiculo-card p-4 rounded shadow-sm" style="background-color:@color;">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <div class="vehiculo-nombre fw-bold fs-4">
+                                @item.Marca @item.Modelo
+                            </div>
+
+                            <div class="vehiculo-info mt-3">
+                                <strong>Matrícula:</strong> @item.Matricula
+                            </div>
+
+                            <div class="vehiculo-info">
+                                <strong>Color:</strong> @item.Color
+                            </div>
+
+                            <div class="vehiculo-info">
+                                <strong>Año:</strong> @item.Anio
+                            </div>
+
+                            <div class="vehiculo-info">
+                                <strong>Cliente dueño:</strong> @nombreCliente
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2 flex-wrap">
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-info text-white">
+                            Details
+                        </a>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-warning text-white">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-danger">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

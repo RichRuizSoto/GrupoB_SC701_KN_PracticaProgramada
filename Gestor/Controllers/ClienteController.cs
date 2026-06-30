@@ -92,8 +92,30 @@ namespace Gestor.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            await httpClient.DeleteAsync($"https://localhost:7217/api/cliente/{id}");
-            return RedirectToAction("Index");
+            var cliente = await httpClient.GetFromJsonAsync<Cliente>($"https://localhost:7217/api/cliente/{id}");
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            return View(cliente);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.DeleteAsync($"https://localhost:7217/api/cliente/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError(string.Empty, error);
+                return RedirectToAction(nameof(Index));
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)

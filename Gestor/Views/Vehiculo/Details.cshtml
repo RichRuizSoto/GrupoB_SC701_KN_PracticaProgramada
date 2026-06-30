@@ -1,0 +1,64 @@
+﻿@model API.Models.Vehiculo
+
+@{
+    ViewData["Title"] = "Details";
+    var clientesPorId = ViewBag.ClientesPorId as Dictionary<int, string>;
+    var nombreCliente = clientesPorId != null && clientesPorId.ContainsKey(Model.ClienteId)
+        ? clientesPorId[Model.ClienteId]
+        : "Cliente no encontrado";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Vehículo</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Matrícula
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Matricula)
+        </dd>
+
+        <dt class="col-sm-2">
+            Marca
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Marca)
+        </dd>
+
+        <dt class="col-sm-2">
+            Modelo
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Modelo)
+        </dd>
+
+        <dt class="col-sm-2">
+            Color
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Color)
+        </dd>
+
+        <dt class="col-sm-2">
+            Año
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Anio)
+        </dd>
+
+        <dt class="col-sm-2">
+            Cliente dueño
+        </dt>
+        <dd class="col-sm-10">
+            @nombreCliente
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
