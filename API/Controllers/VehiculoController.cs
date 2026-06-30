@@ -143,5 +143,10 @@ namespace API.Controllers
             return true;
         }
 
+        public static bool vehiculoPerteneceACliente(int vehiculoId, int clienteId)
+        {
+            return vehiculos.Any(v => v.Id == vehiculoId && v.ClienteId == clienteId);
+        }
+
     }
 }

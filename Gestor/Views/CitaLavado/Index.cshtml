@@ -1,0 +1,466 @@
+@model Gestor.Models.CitaLavadoIndexViewModel
+
+@{
+    ViewData["Title"] = "Citas de lavado";
+
+    var totalCitas = Model.Citas.Count;
+    var citasIngresadas = Model.Citas.Count(c => c.Estado == "Ingresada");
+    var citasCanceladas = Model.Citas.Count(c => c.Estado == "Cancelada");
+    var citasConcluidas = Model.Citas.Count(c => c.Estado == "Concluida");
+
+    string ObtenerCliente(int clienteId)
+    {
+        var cliente = Model.Clientes.FirstOrDefault(c => c.Id == clienteId);
+        return cliente == null ? "Cliente no encontrado" : $"{cliente.Nombre} {cliente.Apellido}";
+    }
+
+    string ObtenerVehiculo(int vehiculoId)
+    {
+        var vehiculo = Model.Vehiculos.FirstOrDefault(v => v.Id == vehiculoId);
+        return vehiculo == null ? "Vehiculo no encontrado" : $"{vehiculo.Marca} {vehiculo.Modelo} - {vehiculo.Matricula}";
+    }
+
+    string ObtenerClaseEstado(string estado)
+    {
+        return estado switch
+        {
+            "Ingresada" => "estado-ingresada",
+            "Cancelada" => "estado-cancelada",
+            "Concluida" => "estado-concluida",
+            _ => "estado-default"
+        };
+    }
+}
+
+<style>
+    .citas-hero {
+        background: #111827;
+        border-radius: 10px;
+        color: white;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 24px rgba(17, 24, 39, 0.16);
+    }
+
+    .citas-hero h2 {
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .citas-hero p {
+        color: #d1d5db;
+        margin-bottom: 0;
+    }
+
+    .citas-resumen {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        margin-bottom: 24px;
+    }
+
+    .resumen-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .resumen-label {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .resumen-valor {
+        color: #111827;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .citas-panel {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+        padding: 18px;
+    }
+
+    .citas-panel thead th {
+        background: #f9fafb;
+        color: #374151;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    .cliente-principal {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .vehiculo-detalle {
+        color: #4b5563;
+        font-size: 14px;
+    }
+
+    .estado-badge {
+        border-radius: 999px;
+        display: inline-block;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 7px 12px;
+    }
+
+    .estado-ingresada {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .estado-cancelada {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .estado-concluida {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .estado-default {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .acciones-cita {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .modal-content {
+        border: 0;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+</style>
+
+<div class="citas-hero d-flex justify-content-between align-items-center">
+    <div>
+        <h2>Citas de lavado</h2>
+        <p>Control de clientes, vehiculos y estados de atencion</p>
+    </div>
+
+    <button type="button"
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#crearCitaModal">
+        Nueva cita
+    </button>
+</div>
+
+<div class="citas-resumen">
+    <div class="resumen-card">
+        <div class="resumen-label">Total</div>
+        <div class="resumen-valor">@totalCitas</div>
+    </div>
+
+    <div class="resumen-card">
+        <div class="resumen-label">Ingresadas</div>
+        <div class="resumen-valor">@citasIngresadas</div>
+    </div>
+
+    <div class="resumen-card">
+        <div class="resumen-label">Canceladas</div>
+        <div class="resumen-valor">@citasCanceladas</div>
+    </div>
+
+    <div class="resumen-card">
+        <div class="resumen-label">Concluidas</div>
+        <div class="resumen-valor">@citasConcluidas</div>
+    </div>
+</div>
+
+<div class="table-responsive citas-panel">
+    <table id="citasTable" class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Vehiculo</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cita in Model.Citas)
+            {
+                <tr>
+                    <td>
+                        <div class="cliente-principal">@ObtenerCliente(cita.ClienteId)</div>
+                    </td>
+                    <td>
+                        <div class="vehiculo-detalle">@ObtenerVehiculo(cita.VehiculoId)</div>
+                    </td>
+                    <td>@cita.FechaCita.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <span class="estado-badge @ObtenerClaseEstado(cita.Estado)">@cita.Estado</span>
+                    </td>
+                    <td>
+                        <div class="acciones-cita">
+                            <button type="button"
+                                    class="btn btn-outline-warning btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editarCitaModal-@cita.Id">
+                                Editar
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-outline-primary btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#estadoCitaModal-@cita.Id">
+                                Estado
+                            </button>
+
+                            <form asp-action="Delete"
+                                  asp-route-id="@cita.Id"
+                                  method="post"
+                                  class="d-inline formulario-eliminar">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="crearCitaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <select name="ClienteId" class="form-select cliente-select" required>
+                            <option value="">Seleccione un cliente</option>
+                            @foreach (var cliente in Model.Clientes)
+                            {
+                                <option value="@cliente.Id">@cliente.Nombre @cliente.Apellido</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Vehiculo</label>
+                        <select name="VehiculoId" class="form-select vehiculo-select" required>
+                            <option value="">Seleccione un vehiculo</option>
+                            @foreach (var vehiculo in Model.Vehiculos)
+                            {
+                                <option value="@vehiculo.Id" data-cliente-id="@vehiculo.ClienteId">
+                                    @vehiculo.Marca @vehiculo.Modelo - @vehiculo.Matricula
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de la cita</label>
+                        <input name="FechaCita" type="datetime-local" class="form-control" required />
+                    </div>
+
+                    <input name="Estado" type="hidden" value="Ingresada" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@foreach (var cita in Model.Citas)
+{
+    <div class="modal fade" id="editarCitaModal-@cita.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-action="Edit" asp-route-id="@cita.Id" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar cita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input name="Id" type="hidden" value="@cita.Id" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <select name="ClienteId" class="form-select cliente-select" required>
+                                @foreach (var cliente in Model.Clientes)
+                                {
+                                    <option value="@cliente.Id" selected="@(cliente.Id == cita.ClienteId ? "selected" : null)">
+                                        @cliente.Nombre @cliente.Apellido
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Vehiculo</label>
+                            <select name="VehiculoId" class="form-select vehiculo-select" required>
+                                @foreach (var vehiculo in Model.Vehiculos)
+                                {
+                                    <option value="@vehiculo.Id"
+                                            data-cliente-id="@vehiculo.ClienteId"
+                                            selected="@(vehiculo.Id == cita.VehiculoId ? "selected" : null)">
+                                        @vehiculo.Marca @vehiculo.Modelo - @vehiculo.Matricula
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de la cita</label>
+                            <input name="FechaCita"
+                                   type="datetime-local"
+                                   value="@cita.FechaCita.ToString("yyyy-MM-ddTHH:mm")"
+                                   class="form-control"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Estado</label>
+                            <select name="Estado" class="form-select" required>
+                                @foreach (var estado in Model.Estados)
+                                {
+                                    <option value="@estado" selected="@(estado == cita.Estado ? "selected" : null)">
+                                        @estado
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="estadoCitaModal-@cita.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-action="CambiarEstado" asp-route-id="@cita.Id" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cambiar estado</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" class="form-select" required>
+                            @foreach (var estado in Model.Estados)
+                            {
+                                <option value="@estado" selected="@(estado == cita.Estado ? "selected" : null)">
+                                    @estado
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css" />
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#citasTable").DataTable({
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json"
+                }
+            });
+
+            $(".cliente-select").each(function () {
+                filtrarVehiculos(this);
+            });
+        });
+
+        $(".cliente-select").on("change", function () {
+            filtrarVehiculos(this);
+        });
+
+        $(".formulario-eliminar").on("submit", function (event) {
+            event.preventDefault();
+            const formulario = this;
+
+            Swal.fire({
+                title: "Eliminar cita",
+                text: "Esta accion eliminara la cita seleccionada.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    formulario.submit();
+                }
+            });
+        });
+
+        function filtrarVehiculos(clienteSelect) {
+            const clienteId = clienteSelect.value;
+            const modal = clienteSelect.closest(".modal-body");
+            const vehiculoSelect = modal.querySelector(".vehiculo-select");
+
+            Array.from(vehiculoSelect.options).forEach(function (option) {
+                if (!option.value) {
+                    option.hidden = false;
+                    return;
+                }
+
+                option.hidden = option.dataset.clienteId !== clienteId;
+            });
+
+            const opcionSeleccionada = vehiculoSelect.selectedOptions[0];
+            if (opcionSeleccionada && opcionSeleccionada.hidden) {
+                vehiculoSelect.value = "";
+            }
+        }
+
+        const mensajeError = @Html.Raw(Json.Serialize(TempData["Error"]));
+        const mensajeExito = @Html.Raw(Json.Serialize(TempData["Success"]));
+
+        if (mensajeError) {
+            Swal.fire("Error", mensajeError, "error");
+        }
+
+        if (mensajeExito) {
+            Swal.fire("Correcto", mensajeExito, "success");
+        }
+    </script>
+}
