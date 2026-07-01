@@ -1,5 +1,6 @@
 ﻿using API.Models;
 using Microsoft.AspNetCore.Mvc;
+using API.Controllers;
 
 namespace API.Controllers
 {
@@ -121,10 +122,17 @@ namespace API.Controllers
         public IActionResult DeleteVehiculo(int id)
         {
             var vehiculo = vehiculos.FirstOrDefault(c => c.Id == id);
+
             if (vehiculo == null)
             {
                 return NotFound();
             }
+
+            if (CitaLavadoController.VehiculoTieneCita(id))
+            {
+                return BadRequest("El vehículo tiene una cita.");
+            }
+
             vehiculos.Remove(vehiculo);
             return Ok();
         }

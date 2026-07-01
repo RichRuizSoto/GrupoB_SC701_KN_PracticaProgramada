@@ -24,13 +24,13 @@ namespace API.Controllers
                     new Telefono
                     {
                         Id = 1,
-                        Numero = "8888-8888",
+                        Numero = 88888888,
                         Tipo = "Móvil"
                     },
                     new Telefono
                     {
                         Id = 2,
-                        Numero = "2222-2222",
+                        Numero = 22222222,
                         Tipo = "Casa"
                     }
                 }
@@ -49,7 +49,7 @@ namespace API.Controllers
                     new Telefono
                     {
                         Id = 3,
-                        Numero = "7777-7777",
+                        Numero = 7777-7777,
                         Tipo = "Trabajo"
                     }
                 }

@@ -75,6 +75,7 @@
                     <div class="col-md-5">
                         <label>Número</label>
                         <input name="Telefonos[0].Numero" class="form-control" />
+                        <span asp-validation-for="Telefonos[0].Numero" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-5">
@@ -84,6 +85,7 @@
                             <option>Casa</option>
                             <option>Trabajo</option>
                         </select>
+                        <span asp-validation-for="Telefonos[0].Tipo" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
@@ -128,19 +130,21 @@
             <div class="border rounded p-3 mb-3 telefono-item">
                 <div class="row">
 
-                    <div class="col-md-5">
-                        <label>Número</label>
-                        <input name="Telefonos[${indiceTelefono}].Numero" class="form-control" />
-                    </div>
+                            <div class="col-md-5">
+            <label>Número</label>
+            <input name="Telefonos[0].Numero" class="form-control" />
+            <span asp-validation-for="Telefonos[0].Numero" class="text-danger"></span>
+        </div>
 
-                    <div class="col-md-5">
-                        <label>Tipo</label>
-                        <select name="Telefonos[${indiceTelefono}].Tipo" class="form-select">
-                            <option>Móvil</option>
-                            <option>Casa</option>
-                            <option>Trabajo</option>
-                        </select>
-                    </div>
+        <div class="col-md-5">
+            <label>Tipo</label>
+            <select name="Telefonos[0].Tipo" class="form-select">
+                <option>Móvil</option>
+                <option>Casa</option>
+                <option>Trabajo</option>
+            </select>
+            <span asp-validation-for="Telefonos[0].Tipo" class="text-danger"></span>
+        </div>
 
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="button"

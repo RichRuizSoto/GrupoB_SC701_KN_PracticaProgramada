@@ -1,9 +1,13 @@
-﻿namespace API.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace API.Models
 {
     public class Telefono
     {
         public int Id { get; set; }
-        public string Numero { get; set; } = string.Empty;
+        [Required]
+        [Range(10000000, int.MaxValue, ErrorMessage = "El número debe tener al menos 8 dígitos.")]
+        public int Numero { get; set; }
         public string Tipo { get; set; } = string.Empty;
 
         public int ClienteId { get; set; }

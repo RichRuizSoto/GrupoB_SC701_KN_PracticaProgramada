@@ -142,16 +142,23 @@ namespace Web.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var response = await httpClient.DeleteAsync(
-                $"https://localhost:7217/api/vehiculo/{id}"
-            );
+            var response = await httpClient.DeleteAsync($"https://localhost:7217/api/vehiculo/{id}");
 
             if (!response.IsSuccessStatusCode)
             {
-                ModelState.AddModelError(string.Empty, "No se pudo eliminar el vehículo.");
-                return RedirectToAction(nameof(Index));
+                var error = await response.Content.ReadAsStringAsync();
+                TempData["Error"] = error;
+
+                var vehiculo = await httpClient.GetFromJsonAsync<Vehiculo>($"https://localhost:7217/api/vehiculo/{id}");
+                if (vehiculo == null)
+                {
+                    return NotFound();
+                }
+
+                return View("Delete", vehiculo);
             }
 
+            TempData["Success"] = "El vehículo fue eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 

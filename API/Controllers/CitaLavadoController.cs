@@ -167,5 +167,11 @@ namespace API.Controllers
         {
             return EstadosPermitidos.Contains(estado) == false;
         }
+
+        public static bool VehiculoTieneCita(int vehiculoId)
+        {
+            return citas.Any(c =>
+                c.VehiculoId == vehiculoId);
+        }
     }
 }

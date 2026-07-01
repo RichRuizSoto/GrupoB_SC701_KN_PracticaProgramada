@@ -1,6 +1,7 @@
 using API.Models;
 using Gestor.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Json;
 
 namespace Gestor.Controllers
 {
@@ -28,14 +29,41 @@ namespace Gestor.Controllers
             return View(modelo);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+
+            var modelo = new CitaLavadoIndexViewModel
+            {
+                Clientes = await ObtenerLista<Cliente>(httpClient, $"{ApiUrl}/Cliente"),
+                Vehiculos = await ObtenerLista<Vehiculo>(httpClient, $"{ApiUrl}/Vehiculo")
+            };
+
+            return View(modelo);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CitaLavado cita)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            var response = await httpClient.PostAsJsonAsync($"{ApiUrl}/CitaLavado", cita);
+            if (!ModelState.IsValid)
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+
+                var modelo = new CitaLavadoIndexViewModel
+                {
+                    Clientes = await ObtenerLista<Cliente>(httpClient, $"{ApiUrl}/Cliente"),
+                    Vehiculos = await ObtenerLista<Vehiculo>(httpClient, $"{ApiUrl}/Vehiculo")
+                };
+
+                return View(modelo);
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.PostAsJsonAsync($"{ApiUrl}/CitaLavado", cita);
 
             await GuardarMensaje(response, "La cita fue registrada correctamente.");
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -45,7 +73,7 @@ namespace Gestor.Controllers
             var response = await httpClient.PutAsJsonAsync($"{ApiUrl}/CitaLavado/{id}", cita);
 
             await GuardarMensaje(response, "La cita fue actualizada correctamente.");
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -55,7 +83,7 @@ namespace Gestor.Controllers
             var response = await httpClient.PutAsync($"{ApiUrl}/CitaLavado/{id}/estado/{estado}", null);
 
             await GuardarMensaje(response, "El estado de la cita fue actualizado correctamente.");
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -65,7 +93,7 @@ namespace Gestor.Controllers
             var response = await httpClient.DeleteAsync($"{ApiUrl}/CitaLavado/{id}");
 
             await GuardarMensaje(response, "La cita fue eliminada correctamente.");
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         private static async Task<List<T>> ObtenerLista<T>(HttpClient httpClient, string url)

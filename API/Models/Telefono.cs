@@ -8,7 +8,7 @@ namespace API.Models
         public int Id { get; set; }
 
         [Required]
-        public string Numero { get; set; } = string.Empty;
+        public int Numero { get; set; }
 
         [Required]
         public string Tipo { get; set; } = string.Empty;
